@@ -89,3 +89,7 @@ INFO     [2017-10-16 01:27:42,445] [139847949563648 : info] readConfig {'telegra
 INFO     [2017-10-16 01:27:42,445] [139847949563648 : info] read config config.ini
 INFO     [2017-10-16 01:27:42,445] [139847949563648 : info] CREATE instanse Bot: token = 416385445:AAEZI0_oRTg7FC5d4M0fWQqdYBEBvs6UBoI
 ERROR    [2017-10-16 01:27:42,445] [139847949563648 : error] doRequest: url = https://api.telegram.org/bot416385445:AAEZI0_oRTg7FC5d4M0fWQqdYBEBvs6UBoI/getUpdates data = 
+INFO     [2017-10-16 01:51:13,636] [140498971842304 : info] readConfig {'telegram_token': '416385445:AAEZI0_oRTg7FC5d4M0fWQqdYBEBvs6UBoI'}
+INFO     [2017-10-16 01:51:13,637] [140498971842304 : info] read config config.ini
+INFO     [2017-10-16 01:51:13,637] [140498971842304 : info] CREATE instanse Bot: token = 416385445:AAEZI0_oRTg7FC5d4M0fWQqdYBEBvs6UBoI
+ERROR    [2017-10-16 01:51:13,637] [140498971842304 : error] doRequest: url = https://api.telegram.org/bot416385445:AAEZI0_oRTg7FC5d4M0fWQqdYBEBvs6UBoI/getUpdates data = 

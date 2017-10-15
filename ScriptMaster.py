@@ -3,7 +3,6 @@ import ConfigParser
 import log
 import telegramBot
 
-
 CONFIG_PATH = "config.ini"
 
 config = {}
@@ -18,10 +17,7 @@ def readConfig(path):
     log.info('readConfig ' + str(config))
 
 
-
-
 def main():
-
     readConfig(CONFIG_PATH)
     log.info('read config ' + CONFIG_PATH)
 
@@ -29,6 +25,7 @@ def main():
 
     # print (bot.getMe().text)
     print (bot.getUpdates().text)
+
 
 if __name__ == '__main__':
     main()
