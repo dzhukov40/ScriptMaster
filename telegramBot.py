@@ -42,8 +42,8 @@ class Bot:
         return self.doRequest('getMe')
 
     # get Updates
-    def getUpdates(self):
-        return self.doRequest('getUpdates')
+    def getUpdates(self, sendData=None):
+        return self.doRequest('getUpdates', sendData)
 
 
 if __name__ == '__main__':
