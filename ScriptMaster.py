@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import ConfigParser
+import json
+from time import sleep
+
 import log
 import telegramBot
 
@@ -17,6 +20,10 @@ def readConfig(path):
     log.info('readConfig ' + str(config))
 
 
+def tort(msg):
+    print ('hi msg = ' + str(msg))
+
+
 def main():
     readConfig(CONFIG_PATH)
     log.info('read config ' + CONFIG_PATH)
@@ -24,7 +31,7 @@ def main():
     bot = telegramBot.Bot(config['telegram_token'])
 
     # print (bot.getMe().text)
-    print (bot.getUpdates().text)
+    bot.startListen(tort)
 
 
 if __name__ == '__main__':
