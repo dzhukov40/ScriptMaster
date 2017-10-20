@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import threading
 from time import sleep
 
 import config
@@ -12,39 +13,60 @@ import enum
 # https://core.telegram.org/bots/api
 
 
-offset = 0  # параметр необходим для подтверждения обновления
-data = {'offset': 0, 'limit': 5, 'timeout': 0}
-
-
 class State(enum.Enum):
     START = 1
     STOP = 2
 
 
+# method names
+class Method(enum.Enum):
+    GET_ME = 'getMe'
+    GET_UPDATES = 'getUpdates'
+    SEND_MESSAGE = 'sendMessage'
+    SEND_PHOTO = 'sendPhoto'
+    SEND_AUDIO = 'sendAudio'
+    SEND_DOCUMENT = 'sendDocument'
+
+
 class Bot:
     URL = 'https://api.telegram.org/bot'  # URL на который отправляется запрос
+    WORK_URL = ''
     token = ''
     startStopFlag = State.STOP
+    TIME_OUT = 10
+    TIME_PAUSE = 0.3
+    thread_ = threading
 
     # constructor
-    def __init__(self, token):
+    def __init__(self, token=''):
+        if token is not '':
+            self.setToken(token)
         self.token = token
         self.startStopFlag = State.STOP
-        log.info('CREATE instanse Bot: token = ' + token)
+        log.info('CREATE instance Bot: token = ' + token)
+
+    # for work need telegram token
+    def setToken(self, token):
+        self.token = token
+        self.WORK_URL = self.URL + self.token + '/'
+        log.info('setToken: token = ' + token)
+        log.info('set WORK_URL: WORK_URL = ' + self.WORK_URL)
 
     # do request and get response
-    def doRequest(self, method, sendData=None):
+    def doRequest(self, method, files=None, data=None):
+        response = 666
         try:
-            url = self.URL + self.token + '/' + method
-            log.debug('doRequest: url = ' + url + ' data = ')
-            response = requests.post(url, sendData)  # собственно сам запрос
-            log.debug('response' + response.text)
+            log.debug(
+                'doRequest: WORK_URL = ' + self.WORK_URL + method + ', files = ' + str(files) + ', data = ' + str(data))
+            response = requests.post(self.WORK_URL + method, files=files, data=data,
+                                     timeout=self.TIME_OUT)  # собственно сам запрос
+            log.debug('getResponse' + response.text)
         except BaseException as e:
-            log.error('Error request: method = ' + method + ' data = ' + sendData + e.message)
-            return False
+            log.error('Error request: method = ' + method + ', data = ' + str(data) + ', e = ' + str(e))
+            return response
 
-        if (not response.status_code == 200) or (not response.json()['ok']):
-            log.error('Error response: status_code = ' + str(response.status_code) + ' json = ' + str(response.json()['ok']))
+        if response.status_code != 200:
+            log.error('Error response: status_code = ' + str(response.status_code) + ', response = ' + response.text)
 
         return response
 
@@ -78,20 +100,23 @@ class Bot:
     #
     #    Please note that this parameter doesn't affect updates created before the call to the getUpdates,
     #    so unwanted updates may be received for a short period of time.
-    #
-    #
-    #
     def getUpdates(self, sendData=None):
-        return self.doRequest('getUpdates', sendData)
+        return self.doRequest(Method.GET_UPDATES, data=sendData)
 
-    def startListen(self, func):
+    # this method for loop request new message
+    def worker(self, func):
+        if self.token == '':
+            log.error('you must set token')
+            return 'you must set token'
 
         self.startStopFlag = State.START
-        # получаем сообщения по одному
+
+        # we get message one by one
         update = {'offset': 0, 'limit': 1, 'timeout': 0}
 
+        # loop
         while True:
-            sleep(1)  # pause
+            sleep(self.TIME_PAUSE)  # pause
             if self.startStopFlag == State.STOP:  # check loop status
                 break
 
@@ -101,10 +126,100 @@ class Bot:
             if var:  # have new message
                 update['offset'] = var[0]['update_id'] + 1  # update (offset)
                 log.info('we get message = ' + str(var[0]))
-                func(var[0])
+                func(var[0])  # call function
 
+    # this function can work in same or different thread then (fork=True)
+    def startListen(self, func, fork=False):
+        if fork is True:
+            self.thread_ = threading.Thread(target=self.worker, args=[func])  # заметь квадратные скобки!!!
+            self.thread_.start()
+        else:
+            self.worker(func)
+
+    # we wont stop infinity loop
     def stopListen(self):
         self.startStopFlag = State.STOP
+
+    # send text message
+    def sendMessage(self,
+                    chat_id,
+                    text,
+                    parse_mode=None,
+                    disable_web_page_preview=None,
+                    disable_notification=None,
+                    reply_to_message_id=None,
+                    reply_markup=None):
+
+        message = {'chat_id': chat_id,
+                   'text': text,
+                   'parse_mode': parse_mode,
+                   'disable_web_page_preview': disable_web_page_preview,
+                   'disable_notification': disable_notification,
+                   'reply_to_message_id': reply_to_message_id,
+                   'reply_markup': reply_markup}
+
+        self.doRequest(Method.SEND_MESSAGE, data=message)
+
+    # send photo example [ sendPhoto(3, open('1.jpg', 'rb')) ]
+    def sendPhoto(self,
+                  chat_id,
+                  photo,
+                  caption=None,
+                  disable_notification=None,
+                  reply_to_message_id=None):
+
+        # if isinstance(photo, file):
+        data = {'chat_id': chat_id,
+                'caption': caption,
+                'disable_notification': disable_notification,
+                'reply_to_message_id': reply_to_message_id}
+        files = {'photo': photo}
+
+        if isinstance(photo, str):
+            data = {'chat_id': chat_id, 'photo': photo}
+            files = None
+
+        self.doRequest(Method.SEND_PHOTO, files=files, data=data)
+
+    # send audio example [ sendAudio(3, open('song.mp3', 'rb')) ]
+    def sendAudio(self,
+                  chat_id,
+                  audio,
+                  caption=None,
+                  duration=None,
+                  performer=None,
+                  title=None,
+                  disable_notification=None,
+                  reply_to_message_id=None,
+                  reply_markup=None):
+
+        # if isinstance(photo, file):
+        data = {'chat_id': chat_id,
+                'caption': caption,
+                'duration': duration,
+                'performer': performer,
+                'title': title,
+                'disable_notification': disable_notification,
+                'reply_to_message_id': reply_to_message_id,
+                'reply_markup': reply_markup}
+        files = {'audio': audio}
+
+        if isinstance(audio, str):
+            data = {'chat_id': chat_id, 'audio': audio}
+            files = None
+
+        self.doRequest(Method.SEND_AUDIO, files=files, data=data)
+
+
+# class for help use Bot methods
+class BotUtility:
+    def __init__(self):
+        pass
+
+    # get id chat from msg
+    @staticmethod
+    def getMessageChatId(msg):
+        return msg['message']['chat']['id']
 
 
 if __name__ == '__main__':

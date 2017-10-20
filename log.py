@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging.handlers
 
-LOG_FILENAME = "ScriptMaster.log"
-DEBUG_LEVEL = logging.INFO  # ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL')
+LOG_FILENAME = "logs/ScriptMaster.log"
+DEBUG_LEVEL = logging.DEBUG  # ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL')
 LOG_FORMAT = "%(levelname)-8s [%(asctime)s] [%(thread)d : %(funcName)s] %(message)s"
 
 logg = logging.getLogger('MyLogger')
