@@ -3,16 +3,18 @@ import functools
 import threading
 from time import sleep
 
-import config
-import requests
-import log
 import enum
+import requests
 
+import log
 # this is HTTP API
 # https://tlgrm.ru/docs/bots/api
 # https://core.telegram.org/bots/api
-from base import TelegramObject
-from message import Message
+
+from available_types import (User, Message, Update)
+
+
+
 
 
 class State(enum.Enum):
@@ -35,6 +37,17 @@ class Method(enum.Enum):
     SEND_VENUE = 'sendVenue'
     SEND_CONTACT = 'sendContact'
     SEND_CHAT_ACTION = 'sendChatAction'
+
+
+# method names
+class ChatAction(enum.Enum):
+    UPLOAD_PHOTO = 'upload_photo'
+    UPLOAD_VIDEO = 'upload_video'
+    UPLOAD_AUDIO = 'upload_audio'
+    UPLOAD_DOCUMENT = 'upload_document'
+    FIND_LOCATION = 'find_location'
+    RECORD_VIDEO_NOTE = 'record_video_note'
+    UPLOAD_VIDEO_NOTE = 'upload_video_note'
 
 
 # send decorator
@@ -63,21 +76,20 @@ def message(func):
         if files is not None:
             del data['files']
 
-
         log.debug('DO REQUESTS: url = ' + url + ', data = ' + str(data))
-        result = requests.post(url, files=files, data=data, timeout=timeout)
-        log.debug('GET RESPONSE: result = ' + result.text)
+        response = requests.post(url, files=files, data=data, timeout=timeout)
+        log.debug('GET RESPONSE: result = ' + response.text)
 
-        if result is True:
-            return result
+        if (response.status_code != 200) and (not response.json()['ok']):
+            log.error('Error response: status_code = ' + str(response.status_code) + ', response = ' + response.text)
 
-        # return Message.de_json(result, self)
-        return result
+        return response
 
     return decorator
 
 
-class Bot(TelegramObject):
+# TODO: maybe we must use extending (*) create base class
+class Bot:
     URL = 'https://api.telegram.org/bot'  # URL на который отправляется запрос
     WORK_URL = ''
     base_url = ''
@@ -142,7 +154,7 @@ class Bot(TelegramObject):
         self.startStopFlag = State.START
 
         # we get message one by one
-        update = {'offset': 0, 'limit': 1, 'timeout': 0}
+        data = {'offset': 0, 'limit': 1, 'timeout': 0}
 
         # loop
         while True:
@@ -150,13 +162,20 @@ class Bot(TelegramObject):
             if self.startStopFlag == State.STOP:  # check loop status
                 break
 
-            res = self.getUpdates(update)  # try get one new message
-            var = res.json()['result']
+            # try get one new message, only one on the list
+            update = Update.jsonConstructor(self.getUpdates(data).json()['result'][0], self)
+            # TODO: must use UpdateType
 
-            if var:  # have new message
-                update['offset'] = var[0]['update_id'] + 1  # update (offset)
-                log.info('WE GET MSG: ' + str(var[0]))
-                func(var[0])  # call function
+            print '---\n' + str(update) + '\n---'
+
+
+            # var = res.json()['result']
+            #
+            # if var:  # have new message
+            #     update['offset'] = var[0]['update_id'] + 1  # update (offset)
+            #     log.info('WE GET MSG: ' + str(var[0]))
+            #     func(var[0])  # call function
+            func(update)  # call function
 
     # we can use for jon thread
     def join_(self):
@@ -176,12 +195,7 @@ class Bot(TelegramObject):
         self.startStopFlag = State.STOP
 
     @message
-    def sendMessage(self,
-                    chat_id,
-                    text,
-                    parse_mode=None,
-                    disable_web_page_preview=None,
-                    **kwargs):
+    def sendMessage(self, chat_id, text, parse_mode=None, disable_web_page_preview=None, **kwargs):
 
         url = '{0}/{1}'.format(self.base_url, Method.SEND_MESSAGE)
         data = {'chat_id': chat_id, 'text': text}
@@ -216,7 +230,7 @@ class Bot(TelegramObject):
 
         return url, data
 
-    # send audio (*) must be in the .mp3 format and not up to 50 MB
+    # send audio (*) must be in the .mp3 format and up to 50 MB
     # photo: 1 - [ open('...', 'rb')) ], 2 - [ 'https://...') ], 3 - [ ... ]
     @message
     def sendAudio(self, chat_id, audio, caption=None, duration=None, performer=None, title=None, **kwargs):
@@ -233,7 +247,6 @@ class Bot(TelegramObject):
         # 3 variant (*) TODO: need have specific class
         # if isinstance(audio, class):
 
-        # maybe should have global params. For create methods global control
         if caption is not None:
             data['caption'] = caption
         if duration is not None:
@@ -245,198 +258,153 @@ class Bot(TelegramObject):
 
         return url, data
 
-    # send document (*) any file and any size
-    # photo: 1 - [ open('...', 'rb')) ], 2 - [ 'https://...') ], 3 - [ ... ]
-    def sendDocument(self,
-                     chat_id,
-                     document,
-                     caption=None,
-                     disable_notification=None,
-                     reply_to_message_id=None,
-                     reply_markup=None):
+    # send document (*) any file type and up to 50 MB
+    # document: 1 - [ open('...', 'rb')) ], 2 - [ 'https://...') ], 3 - [ ... ]
+    @message
+    def sendDocument(self, chat_id, document, caption=None, **kwargs):
 
-        # Required params
+        url = '{0}/{1}'.format(self.base_url, Method.SEND_DOCUMENT)
         data = {'chat_id': chat_id}
-        files = {'document': document}
 
-        # 1 variant (*) it is default case
-        # if isinstance(audio, file):
+        if isinstance(document, file):  # 1 variant
+            data['files'] = {'document': document}
 
-        # 2 variant
-        if isinstance(document, str):
+        if isinstance(document, str):  # 2 variant
             data['document'] = document
-            files = None
 
         # 3 variant (*) TODO: need have specific class
-        # if isinstance(audio, class):
+        # if isinstance(document, class):
 
-        # maybe should have global params. For create methods global control
         if caption is not None:
             data['caption'] = caption
-        if disable_notification is not None:
-            data['disable_notification'] = disable_notification
-        if reply_to_message_id is not None:
-            data['reply_to_message_id'] = reply_to_message_id
-        if reply_markup is not None:
-            data['reply_markup'] = reply_markup
 
-        # send data
-        self.doRequest(Method.SEND_DOCUMENT, files=files, data=data)
+        return url, data
 
-    # send video (*) must be in the .mp4 format and not up to 50 MB
-    # photo: 1 - [ open('...', 'rb')) ], 2 - [ 'https://...') ], 3 - [ ... ]
-    def sendVideo(self,
-                  chat_id,
-                  video,
-                  duration=None,
-                  width=None,
-                  height=None,
-                  caption=None,
-                  disable_notification=None,
-                  reply_to_message_id=None,
-                  reply_markup=None):
+    # send video (*) must be in the .mp4 format and up to 50 MB
+    # video: 1 - [ open('...', 'rb')) ], 2 - [ 'https://...') ], 3 - [ ... ]
+    @message
+    def sendVideo(self, chat_id, video, duration=None, width=None, height=None, caption=None, **kwargs):
 
-        # Required params
+        url = '{0}/{1}'.format(self.base_url, Method.SEND_VIDEO)
         data = {'chat_id': chat_id}
-        files = {'video': video}
 
-        # 1 variant (*) it is default case
-        # if isinstance(video, file):
+        if isinstance(video, file):  # 1 variant
+            data['files'] = {'video': video}
 
-        # 2 variant
-        if isinstance(video, str):
-            data['document'] = video
-            files = None
+        if isinstance(video, str):  # 2 variant
+            data['video'] = video
 
         # 3 variant (*) TODO: need have specific class
-        # if isinstance(audio, class):
+        # if isinstance(video, class):
 
-        # maybe should have global params. For create methods global control
         if duration is not None:
             data['duration'] = duration
+
         if width is not None:
             data['width'] = width
+
         if height is not None:
             data['height'] = height
+
         if caption is not None:
             data['caption'] = caption
-        if disable_notification is not None:
-            data['disable_notification'] = disable_notification
-        if reply_to_message_id is not None:
-            data['reply_to_message_id'] = reply_to_message_id
-        if reply_markup is not None:
-            data['reply_markup'] = reply_markup
 
-        # send data
-        self.doRequest(Method.SEND_VIDEO, files=files, data=data)
+        return url, data
 
-    # send voice (*) must be in the .ogg format and not up to 50 MB
-    # photo: 1 - [ open('...', 'rb')) ], 2 - [ 'https://...') ], 3 - [ ... ]
-    def sendVoice(self,
-                  chat_id,
-                  voice,
-                  caption=None,
-                  duration=None,
-                  disable_notification=None,
-                  reply_to_message_id=None,
-                  reply_markup=None):
+    # send voice (*) must be in the .ogg format and up to 50 MB
+    # voice: 1 - [ open('...', 'rb')) ], 2 - [ 'https://...') ], 3 - [ ... ]
+    @message
+    def sendVoice(self, chat_id, voice, caption=None, duration=None, **kwargs):
 
-        # Required params
+        url = '{0}/{1}'.format(self.base_url, Method.SEND_VOICE)
         data = {'chat_id': chat_id}
-        files = {'voice': voice}
 
-        # 1 variant (*) it is default case
-        # if isinstance(voice, file):
+        if isinstance(voice, file):  # 1 variant
+            data['files'] = {'voice': voice}
 
-        # 2 variant
-        if isinstance(voice, str):
+        if isinstance(voice, str):  # 2 variant
             data['voice'] = voice
-            files = None
 
         # 3 variant (*) TODO: need have specific class
         # if isinstance(voice, class):
 
-        # maybe should have global params. For create methods global control
         if caption is not None:
             data['caption'] = caption
+
         if duration is not None:
             data['duration'] = duration
-        if disable_notification is not None:
-            data['disable_notification'] = disable_notification
-        if reply_to_message_id is not None:
-            data['reply_to_message_id'] = reply_to_message_id
-        if reply_markup is not None:
-            data['reply_markup'] = reply_markup
 
-        # send data
-        self.doRequest(Method.SEND_VOICE, files=files, data=data)
+        return url, data
 
     # send videoNote (*) must be in the .mp4 format and 1 minute long
-    # photo: 1 - [ open('...', 'rb')) ], 2 - [ 'https://...') ], 3 - [ ... ]
-    def sendVideoNote(self,
-                      chat_id,
-                      video_note,
-                      duration=None,
-                      length=None,
-                      disable_notification=None,
-                      reply_to_message_id=None,
-                      reply_markup=None):
+    # videoNote: 1 - [ open('...', 'rb')) ], 2 - [ 'https://...') ], 3 - [ ... ]
+    @message
+    def sendVideoNote(self, chat_id,  video_note, duration=None, length=None, **kwargs):
 
-        # Required params
+        url = '{0}/{1}'.format(self.base_url, Method.SEND_VIDEO_NOTE)
         data = {'chat_id': chat_id}
-        files = {'video_note': video_note}
 
-        # 1 variant (*) it is default case
-        # if isinstance(video_note, file):
+        if isinstance(video_note, file):  # 1 variant
+            data['files'] = {'video_note': video_note}
 
-        # 2 variant
-        if isinstance(video_note, str):
+        if isinstance(video_note, str):  # 2 variant
             data['video_note'] = video_note
-            files = None
 
         # 3 variant (*) TODO: need have specific class
         # if isinstance(video_note, class):
 
-        # maybe should have global params. For create methods global control
         if duration is not None:
             data['duration'] = duration
+
         if length is not None:
             data['length'] = length
-        if disable_notification is not None:
-            data['disable_notification'] = disable_notification
-        if reply_to_message_id is not None:
-            data['reply_to_message_id'] = reply_to_message_id
-        if reply_markup is not None:
-            data['reply_markup'] = reply_markup
 
-        # send data
-        self.doRequest(Method.SEND_VOICE, files=files, data=data)
+        return url, data
 
-    # send location (*)
-    def sendLocation(self,
-                     chat_id,
-                     latitude,
-                     longitude,
-                     live_period=None,
-                     disable_notification=None,
-                     reply_to_message_id=None,
-                     reply_markup=None):
+    @message
+    def sendLocation(self, chat_id, latitude, longitude, live_period=None, **kwargs):
 
-        # Required params
+        url = '{0}/{1}'.format(self.base_url, Method.SEND_LOCATION)
         data = {'chat_id': chat_id, 'latitude': latitude, 'longitude': longitude}
 
-        # maybe should have global params. For create methods global control
         if live_period is not None:
             data['live_period'] = live_period
-        if disable_notification is not None:
-            data['disable_notification'] = disable_notification
-        if reply_to_message_id is not None:
-            data['reply_to_message_id'] = reply_to_message_id
-        if reply_markup is not None:
-            data['reply_markup'] = reply_markup
 
-        # send data
-        self.doRequest(Method.SEND_LOCATION, data=data)
+        return url, data
+
+    @message
+    def sendVenue(self, chat_id, latitude, longitude, title, address, foursquare_id, **kwargs):
+
+        url = '{0}/{1}'.format(self.base_url, Method.SEND_VENUE)
+        data = {'chat_id': chat_id, 'latitude': latitude, 'longitude': longitude}
+
+        if title is not None:
+            data['title'] = title
+
+        if address is not None:
+            data['address'] = address
+
+        if foursquare_id is not None:
+            data['foursquare_id'] = foursquare_id
+
+        return url, data
+
+    @message
+    def sendContact(self, chat_id, phone_number, first_name, last_name, **kwargs):
+
+        url = '{0}/{1}'.format(self.base_url, Method.SEND_CONTACT)
+        data = {'chat_id': chat_id, 'phone_number': phone_number, 'first_name': first_name, 'last_name': last_name}
+
+        return url, data
+
+    # action must be type [ ChatAction ]
+    @message
+    def sendChatAction(self, chat_id, action, **kwargs):
+
+        url = '{0}/{1}'.format(self.base_url, Method.SEND_CHAT_ACTION)
+        data = {'chat_id': chat_id, 'action': action}
+
+        return url, data
 
 
 # class for help use Bot methods

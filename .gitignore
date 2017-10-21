@@ -1,5 +1,4 @@
 .idea/
 .logs/
-Будет удалено log.pyc
-Будет удалено telegramBot.pyc
+*.pyc
 
