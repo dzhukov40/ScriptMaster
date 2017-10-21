@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging.handlers
 
+# TODO: all bead but work. Must rewrite
+
 LOG_FILENAME = "logs/ScriptMaster.log"
 DEBUG_LEVEL = logging.DEBUG  # ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL')
 LOG_FORMAT = "%(levelname)-8s [%(asctime)s] [%(thread)d : %(funcName)s] %(message)s"

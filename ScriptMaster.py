@@ -25,12 +25,19 @@ def tort(msg):
 
     messageChatId = BotUtility.getMessageChatId(msg)
 
-    bot.sendMessage(messageChatId, 'rewffrg')
-    bot.sendPhoto(messageChatId, open('test_data/1.jpg', 'rb'))
+    bot.sendMessage(messageChatId, 'приветики')
+    bot.sendPhoto(messageChatId, open('test_data/Photo_1.jpg', 'rb'), caption='тетя')
     bot.sendPhoto(messageChatId, 'http://dummyimage.com/600x400/000/fff.png&text=telegram')
     bot.sendAudio(messageChatId, open('test_data/Song_2.mp3', 'rb'))
+    bot.sendAudio(messageChatId, 'https://python-telegram-bot.org/static/testfiles/telegram.mp3')
 
-    bot.stopListen()
+    # 'https://python-telegram-bot.org/static/testfiles/telegram.jpg'
+    # 'https://python-telegram-bot.org/static/testfiles/telegram.gif'
+    # 'https://python-telegram-bot.org/static/testfiles/telegram.mp4'
+    # 'https://python-telegram-bot.org/static/testfiles/telegram.ogg'
+    # 'https://python-telegram-bot.org/static/testfiles/telegram.webp'
+
+    # bot.stopListen()
 
 
 def main():
@@ -41,10 +48,10 @@ def main():
     bot.setToken(config['telegram_token'])
 
     # print (bot.getMe().text)
-    bot.startListen(tort, True)
+    bot.startListen(tort, False)
     print ('основной поток дотопал до конца')
 
-    bot.thread_.join()
+    bot.join_
 
 
 if __name__ == '__main__':
