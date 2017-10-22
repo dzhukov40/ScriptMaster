@@ -3,7 +3,7 @@ import ConfigParser
 
 import logging.handlers
 
-from dah_telegram import Bot
+from dah_telegram import Bot, Update
 
 CONFIG_PATH = "config.ini"
 
@@ -21,7 +21,7 @@ def readConfig(path):
 
 
 def tort(msg):
-
+    msg = Update(msg)
     chatId = msg.message.chat.chat_id
     chatText = msg.message.text
 
