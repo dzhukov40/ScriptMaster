@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import ConfigParser
 
-from telegramBot import Bot
-from telegramBot import BotUtility
-import log
+import logging.handlers
 
+from dah_telegram import Bot
 
 CONFIG_PATH = "config.ini"
+
 
 bot = Bot()
 config = {}
@@ -18,7 +18,6 @@ def readConfig(path):
     parseConfig = ConfigParser.ConfigParser()
     parseConfig.read(path)
     config['telegram_token'] = parseConfig.get("telegram", "telegram_token")
-    log.info('readConfig ' + str(config))
 
 
 def tort(msg):
@@ -56,8 +55,26 @@ def tort(msg):
 
 
 def main():
+
     readConfig(CONFIG_PATH)
-    log.info('read config ' + CONFIG_PATH)
+
+    # TODO: надо вытащить из config.ini параметры логирования
+    LOG_FILENAME = "ScriptMaster.log"
+    DEBUG_LEVEL = logging.DEBUG  # ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL')
+    LOG_FORMAT = "%(levelname)-8s [%(asctime)s] [%(thread)d : %(funcName)s] %(message)s"
+
+    logger = logging.getLogger('MyLogger')
+    logger.setLevel(DEBUG_LEVEL)
+
+    logger.info('read config ' + CONFIG_PATH)
+    # logger rotate config
+    handler = logging.handlers.RotatingFileHandler(LOG_FILENAME, maxBytes=9000000, backupCount=5)
+    handler.setFormatter(logging.Formatter(LOG_FORMAT))
+
+    logger.addHandler(handler)
+
+    logger.info('read config ' + CONFIG_PATH)
+    logger.info('readConfig ' + str(config))
 
     global bot
     bot.setToken(config['telegram_token'])

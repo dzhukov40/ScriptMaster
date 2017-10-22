@@ -16,25 +16,26 @@ handler.setFormatter(logging.Formatter(LOG_FORMAT))
 
 logg.addHandler(handler)
 
+class log:
 
-def info(param):
-    logg.info(param)
+    def info(self, param):
+        logg.info(param)
+
+    def debug(self, param):
+        logg.debug(param)
+
+    def warn(self, param):
+        logg.warn(param)
+
+    def error(self, param):
+        logg.error(param)
+
+    def critical(self, param):
+        logg.critical(param)
 
 
-def debug(param):
-    logg.debug(param)
 
 
-def warn(param):
-    logg.warn(param)
-
-
-def error(param):
-    logg.error(param)
-
-
-def critical(param):
-    logg.critical(param)
 
 
 if __name__ == '__main__':
