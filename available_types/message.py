@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from chat import Chat
+from user import User
 
 
 class Message:
@@ -100,14 +102,14 @@ class Message:
             return None
 
         message = Message(message_id=data.get('message_id'),
-                          from_user=data.get('from_user'),
+                          from_user=User.jsonConstructor(data.get('from'), bot),
                           date=data.get('date'),
-                          chat=data.get('chat'),
-                          forward_from=data.get('forward_from'),
-                          forward_from_chat=data.get('forward_from_chat'),
+                          chat=Chat.jsonConstructor(data.get('chat'), bot),
+                          forward_from=User.jsonConstructor(data.get('forward_from'), bot),
+                          forward_from_chat=Chat.jsonConstructor(data.get('forward_from_chat'), bot),
                           forward_from_message_id=data.get('forward_from_message_id'),
                           forward_date=data.get('forward_date'),
-                          reply_to_message=data.get('reply_to_message'),
+                          reply_to_message=Message.jsonConstructor(data.get('reply_to_message'), bot),
                           edit_date=data.get('edit_date'),
 
                           author_signature=data.get('author_signature'),
@@ -147,46 +149,46 @@ class Message:
         return message
 
     def __str__(self):
-        return ('message_id = ' + str(self.message_id) + ',\n' +
-                'from_user = ' + str(self.from_user) + ',\n' +
-                'date = ' + str(self.date) + ',\n' +
-                'chat = ' + str(self.chat) + ',\n' +
-                'forward_from = ' + str(self.forward_from) + ',\n' +
-                'forward_from_chat = ' + str(self.forward_from_chat) + ',\n' +
-                'forward_from_message_id = ' + str(self.forward_from_message_id) + ',\n' +
-                'forward_date = ' + str(self.forward_date) + ',\n' +
-                'reply_to_message = ' + str(self.reply_to_message) + ',\n' +
-                'edit_date = ' + str(self.edit_date) + ',\n' +
+        return ('message_id = { ' + str(self.message_id) + ' },\n' +
+                'from_user = { ' + str(self.from_user) + ' },\n' +
+                'date = { ' + str(self.date) + ' },\n' +
+                'chat = { ' + str(self.chat) + ' },\n' +
+                'forward_from = { ' + str(self.forward_from) + ' },\n' +
+                'forward_from_chat = { ' + str(self.forward_from_chat) + ' },\n' +
+                'forward_from_message_id = { ' + str(self.forward_from_message_id) + ' },\n' +
+                'forward_date = { ' + str(self.forward_date) + ' },\n' +
+                'reply_to_message = { ' + str(self.reply_to_message) + ' },\n' +
+                'edit_date = { ' + str(self.edit_date) + ' },\n' +
 
-                'author_signature = ' + str(self.author_signature) + ',\n' +
-                'text = ' + str(self.text) + ',\n' +
-                'entities = ' + str(self.entities) + ',\n' +
-                'caption_entities = ' + str(self.caption_entities) + ',\n' +
-                'audio = ' + str(self.audio) + ',\n' +
-                'document = ' + str(self.document) + ',\n' +
-                'game = ' + str(self.game) + ',\n' +
-                'photo = ' + str(self.photo) + ',\n' +
-                'sticker = ' + str(self.sticker) + ',\n' +
-                'video = ' + str(self.video) + ',\n' +
+                'author_signature = { ' + str(self.author_signature) + ',\n' +
+                'text = { ' + str(self.text) + ' },\n' +
+                'entities = { ' + str(self.entities) + ' },\n' +
+                'caption_entities = { ' + str(self.caption_entities) + ' },\n' +
+                'audio = { ' + str(self.audio) + ' },\n' +
+                'document = { ' + str(self.document) + ' },\n' +
+                'game = { ' + str(self.game) + ' },\n' +
+                'photo = { ' + str(self.photo) + ' },\n' +
+                'sticker = { ' + str(self.sticker) + ' },\n' +
+                'video = { ' + str(self.video) + ' },\n' +
 
-                'video_note = ' + str(self.video_note) + ',\n' +
-                'caption = ' + str(self.caption) + ',\n' +
-                'contact = ' + str(self.contact) + ',\n' +
-                'location = ' + str(self.location) + ',\n' +
-                'venue = ' + str(self.venue) + ',\n' +
-                'new_chat_members = ' + str(self.new_chat_members) + ',\n' +
-                'left_chat_member = ' + str(self.left_chat_member) + ',\n' +
-                'new_chat_title = ' + str(self.new_chat_title) + ',\n' +
-                'new_chat_photo = ' + str(self.new_chat_photo) + ',\n' +
-                'delete_chat_photo = ' + str(self.delete_chat_photo) + ',\n' +
+                'video_note = { ' + str(self.video_note) + ' },\n' +
+                'caption = { ' + str(self.caption) + ' },\n' +
+                'contact = { ' + str(self.contact) + ' },\n' +
+                'location = { ' + str(self.location) + ' },\n' +
+                'venue = { ' + str(self.venue) + ' },\n' +
+                'new_chat_members = { ' + str(self.new_chat_members) + ' },\n' +
+                'left_chat_member = { ' + str(self.left_chat_member) + ' },\n' +
+                'new_chat_title = { ' + str(self.new_chat_title) + ' },\n' +
+                'new_chat_photo = { ' + str(self.new_chat_photo) + ' },\n' +
+                'delete_chat_photo = { ' + str(self.delete_chat_photo) + ' },\n' +
 
-                'group_chat_created = ' + str(self.group_chat_created) + ',\n' +
-                'supergroup_chat_created = ' + str(self.supergroup_chat_created) + ',\n' +
-                'channel_chat_created = ' + str(self.channel_chat_created) + ',\n' +
-                'migrate_to_chat_id = ' + str(self.migrate_to_chat_id) + ',\n' +
-                'migrate_from_chat_id = ' + str(self.migrate_from_chat_id) + ',\n' +
-                'pinned_message = ' + str(self.pinned_message) + ',\n' +
-                'invoice = ' + str(self.invoice) + ',\n' +
-                'successful_payment = ' + str(self.successful_payment) + ',\n' +
-                'bot = ' + str(self.bot)
+                'group_chat_created = { ' + str(self.group_chat_created) + ' },\n' +
+                'supergroup_chat_created = { ' + str(self.supergroup_chat_created) + ' },\n' +
+                'channel_chat_created = { ' + str(self.channel_chat_created) + ' },\n' +
+                'migrate_to_chat_id = { ' + str(self.migrate_to_chat_id) + ' },\n' +
+                'migrate_from_chat_id = { ' + str(self.migrate_from_chat_id) + ' },\n' +
+                'pinned_message = { ' + str(self.pinned_message) + ' },\n' +
+                'invoice = { ' + str(self.invoice) + ' },\n' +
+                'successful_payment = { ' + str(self.successful_payment) + ' },\n' +
+                'bot = { ' + str(self.bot) + ' }'
                 )

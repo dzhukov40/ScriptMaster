@@ -29,7 +29,7 @@ class User:
         if (data is None) or (bot is None):  # we return None if can not create instance
             return None
 
-        user = User(user_id=data.get('user_id'),
+        user = User(user_id=data.get('id'),
                     is_bot=data.get('is_bot'),
                     first_name=data.get('first_name'),
                     last_name=data.get('last_name'),
@@ -40,11 +40,11 @@ class User:
         return user
 
     def __str__(self):
-        return ('user_id = ' + str(self.user_id) + ',\n' +
-                'is_bot = ' + str(self.is_bot) + ',\n' +
-                'first_name = ' + str(self.first_name) + ',\n' +
-                'last_name = ' + str(self.last_name) + ',\n' +
-                'username = ' + str(self.username) + ',\n' +
-                'language_code = ' + str(self.language_code) + ',\n' +
-                'bot = ' + str(self.bot)
+        return ('user_id = { ' + str(self.user_id) + ' },\n' +
+                'is_bot = { ' + str(self.is_bot) + ' },\n' +
+                'first_name = { ' + str(self.first_name) + ' },\n' +
+                'last_name = { ' + str(self.last_name) + ' },\n' +
+                'username = { ' + str(self.username) + ' },\n' +
+                'language_code = { ' + str(self.language_code) + ' },\n' +
+                'bot = { ' + str(self.bot) + ' }'
                 )

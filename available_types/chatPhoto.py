@@ -27,7 +27,7 @@ class ChartPhoto:
         return chartPhoto
 
     def __str__(self):
-        return ('small_file_id = ' + str(self.small_file_id) + ',\n' +
-                'big_file_id = ' + str(self.big_file_id) + ',\n' +
-                'bot = ' + str(self.bot)
+        return ('small_file_id = { ' + str(self.small_file_id) + ' },\n' +
+                'big_file_id = { ' + str(self.big_file_id) + ' },\n' +
+                'bot = { ' + str(self.bot) + ' }'
                 )

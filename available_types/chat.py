@@ -43,8 +43,8 @@ class Chat:
         if (data is None) or (bot is None):  # we return None if can not create instance
             return None
 
-        chat = Chat(chat_id=data.get('chat_id'),
-                    chat_type=data.get('chat_type'),
+        chat = Chat(chat_id=data.get('id'),
+                    chat_type=data.get('type'),
                     title=data.get('title'),
                     username=data.get('username'),
                     first_name=data.get('first_name'),
@@ -61,18 +61,18 @@ class Chat:
         return chat
 
     def __str__(self):
-        return ('chat_id = ' + str(self.chat_id) + ',\n' +
-                'chat_type = ' + str(self.chat_type) + ',\n' +
-                'title = ' + str(self.title) + ',\n' +
-                'username = ' + str(self.username) + ',\n' +
-                'first_name = ' + str(self.first_name) + ',\n' +
-                'last_name = ' + str(self.last_name) + ',\n' +
-                'group_chat_created = ' + str(self.group_chat_created) + ',\n' +
-                'photo = ' + str(self.photo) + ',\n' +
-                'description = ' + str(self.description) + ',\n' +
-                'invite_link = ' + str(self.invite_link) + ',\n' +
-                'pinned_message = ' + str(self.pinned_message) + ',\n' +
-                'sticker_set_name = ' + str(self.sticker_set_name) + ',\n' +
-                'can_set_sticker_set = ' + str(self.can_set_sticker_set) + ',\n' +
-                'bot = ' + str(self.bot)
+        return ('chat_id = { ' + str(self.chat_id) + ' },\n' +
+                'chat_type = { ' + str(self.chat_type) + ' },\n' +
+                'title = { ' + str(self.title) + ' },\n' +
+                'username = { ' + str(self.username) + ' },\n' +
+                'first_name = { ' + str(self.first_name) + ' },\n' +
+                'last_name = { ' + str(self.last_name) + ' },\n' +
+                'group_chat_created = { ' + str(self.group_chat_created) + ' },\n' +
+                'photo = { ' + str(self.photo) + ' },\n' +
+                'description = { ' + str(self.description) + ' },\n' +
+                'invite_link = { ' + str(self.invite_link) + ' },\n' +
+                'pinned_message = { ' + str(self.pinned_message) + ' },\n' +
+                'sticker_set_name = { ' + str(self.sticker_set_name) + ' },\n' +
+                'can_set_sticker_set = { ' + str(self.can_set_sticker_set) + ' },\n' +
+                'bot = { ' + str(self.bot) + ' }'
                 )

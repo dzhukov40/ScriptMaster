@@ -33,9 +33,9 @@ class OrderInfo:
         return orderInfo
 
     def __str__(self):
-        return ('name = ' + str(self.name) + ',\n' +
-                'phone_number = ' + str(self.phone_number) + ',\n' +
-                'email = ' + str(self.email) + ',\n' +
-                'shipping_address = ' + str(self.shipping_address) + ',\n' +
-                'bot = ' + str(self.bot)
+        return ('name = { ' + str(self.name) + ' },\n' +
+                'phone_number = { ' + str(self.phone_number) + ' },\n' +
+                'email = { ' + str(self.email) + ' },\n' +
+                'shipping_address = { ' + str(self.shipping_address) + ' },\n' +
+                'bot = { ' + str(self.bot) + ' }'
                 )

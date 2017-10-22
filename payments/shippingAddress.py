@@ -39,11 +39,11 @@ class ShippingAddress:
         return shippingAddress
 
     def __str__(self):
-        return ('country_code = ' + str(self.country_code) + ',\n' +
-                'state = ' + str(self.state) + ',\n' +
-                'city = ' + str(self.city) + ',\n' +
-                'street_line1 = ' + str(self.street_line1) + ',\n' +
-                'street_line2 = ' + str(self.street_line2) + ',\n' +
-                'post_code = ' + str(self.post_code) + ',\n' +
-                'bot = ' + str(self.bot)
+        return ('country_code = { ' + str(self.country_code) + ' },\n' +
+                'state = { ' + str(self.state) + ' },\n' +
+                'city = { ' + str(self.city) + ' },\n' +
+                'street_line1 = { ' + str(self.street_line1) + ' },\n' +
+                'street_line2 = { ' + str(self.street_line2) + ' },\n' +
+                'post_code = { ' + str(self.post_code) + ' },\n' +
+                'bot = { ' + str(self.bot) + ' }'
                 )

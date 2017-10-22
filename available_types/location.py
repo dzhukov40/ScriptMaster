@@ -27,7 +27,7 @@ class Location:
         return location
 
     def __str__(self):
-        return ('longitude = ' + str(self.longitude) + ',\n' +
-                'latitude = ' + str(self.latitude) + ',\n' +
-                'bot = ' + str(self.bot)
+        return ('longitude = { ' + str(self.longitude) + ' },\n' +
+                'latitude = { ' + str(self.latitude) + ' },\n' +
+                'bot = { ' + str(self.bot) + ' }'
                 )

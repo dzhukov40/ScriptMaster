@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
+
+
+from available_types.callbackQuery import CallbackQuery
+from inline_mod.chosenInlineResult import ChosenInlineResult
+from inline_mod.inlineQuery import InlineQuery
 from message import Message
+from payments.preCheckoutQuery import PreCheckoutQuery
+from payments.shippingQuery import ShippingQuery
 
 
 class Update:
@@ -43,25 +50,25 @@ class Update:
                         edited_message=Message.jsonConstructor(data.get('edited_message'), bot),
                         channel_post=Message.jsonConstructor(data.get('channel_post'), bot),
                         edited_channel_post=Message.jsonConstructor(data.get('edited_channel_post'), bot),
-                        inline_query=data.get('inline_query'),
-                        chosen_inline_result=data.get('chosen_inline_result'),
-                        callback_query=data.get('callback_query'),
-                        shipping_query=data.get('shipping_query'),
-                        pre_checkout_query=data.get('pre_checkout_query'),
+                        inline_query=InlineQuery.jsonConstructor(data.get('inline_query'), bot),
+                        chosen_inline_result=ChosenInlineResult.jsonConstructor(data.get('chosen_inline_result'), bot),
+                        callback_query=CallbackQuery.jsonConstructor(data.get('callback_query'), bot),
+                        shipping_query=ShippingQuery.jsonConstructor(data.get('shipping_query'), bot),
+                        pre_checkout_query=PreCheckoutQuery.jsonConstructor(data.get('pre_checkout_query'), bot),
                         bot=bot)
 
         return update
 
     def __str__(self):
-        return ('update_id = ' + str(self.update_id) + ',\n' +
-                'message = ' + str(self.message) + ',\n' +
-                'edited_message = ' + str(self.edited_message) + ',\n' +
-                'channel_post = ' + str(self.channel_post) + ',\n' +
-                'edited_channel_post = ' + str(self.edited_channel_post) + ',\n' +
-                'inline_query = ' + str(self.inline_query) + ',\n' +
-                'chosen_inline_result = ' + str(self.chosen_inline_result) + ',\n' +
-                'callback_query = ' + str(self.callback_query) + ',\n' +
-                'shipping_query = ' + str(self.shipping_query) + ',\n' +
-                'pre_checkout_query = ' + str(self.pre_checkout_query) + ',\n' +
-                'bot = ' + str(self.bot)
+        return ('update_id = { ' + str(self.update_id) + ' },\n' +
+                'message = { ' + str(self.message) + ' },\n' +
+                'edited_message = { ' + str(self.edited_message) + ' },\n' +
+                'channel_post = { ' + str(self.channel_post) + ' },\n' +
+                'edited_channel_post = { ' + str(self.edited_channel_post) + ' },\n' +
+                'inline_query = { ' + str(self.inline_query) + ' },\n' +
+                'chosen_inline_result = { ' + str(self.chosen_inline_result) + ' },\n' +
+                'callback_query = { ' + str(self.callback_query) + ' },\n' +
+                'shipping_query = { ' + str(self.shipping_query) + ' },\n' +
+                'pre_checkout_query = { ' + str(self.pre_checkout_query) + ' },\n' +
+                'bot = { ' + str(self.bot) + ' }'
                 )
