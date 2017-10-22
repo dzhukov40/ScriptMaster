@@ -21,7 +21,15 @@ def readConfig(path):
 
 
 def tort(msg):
-    pass
+
+    chatId = msg.message.chat.chat_id
+    chatText = msg.message.text
+
+    print ' msg.chat.chat_id = ' + str(chatId)
+    # print ' msg.message.text = ' + str(chatText)
+
+    bot.sendMessage(chatId, chatText)
+
     # messageChatId = BotUtility.getMessageChatId(msg)
 
     # bot.sendMessage(messageChatId, 'приветики')
@@ -60,21 +68,14 @@ def main():
 
     # TODO: надо вытащить из config.ini параметры логирования
     LOG_FILENAME = "ScriptMaster.log"
-    DEBUG_LEVEL = logging.DEBUG  # ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL')
+    DEBUG_LEVEL = logging.INFO  # ('DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL')
     LOG_FORMAT = "%(levelname)-8s [%(asctime)s] [%(thread)d : %(funcName)s] %(message)s"
+    ROTATE_HANDLER = logging.handlers.RotatingFileHandler(LOG_FILENAME, maxBytes=9000000, backupCount=5)
 
-    logger = logging.getLogger('MyLogger')
-    logger.setLevel(DEBUG_LEVEL)
+    logging.basicConfig(filename=LOG_FILENAME, level=DEBUG_LEVEL, format=LOG_FORMAT, handler=ROTATE_HANDLER)
 
-    logger.info('read config ' + CONFIG_PATH)
-    # logger rotate config
-    handler = logging.handlers.RotatingFileHandler(LOG_FILENAME, maxBytes=9000000, backupCount=5)
-    handler.setFormatter(logging.Formatter(LOG_FORMAT))
-
-    logger.addHandler(handler)
-
-    logger.info('read config ' + CONFIG_PATH)
-    logger.info('readConfig ' + str(config))
+    logging.info('read config ' + CONFIG_PATH)
+    logging.info('readConfig ' + str(config))
 
     global bot
     bot.setToken(config['telegram_token'])

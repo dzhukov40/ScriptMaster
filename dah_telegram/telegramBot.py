@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import functools
+import json
 import threading
 import logging
 from time import sleep
@@ -7,7 +8,7 @@ from time import sleep
 import enum
 import requests
 
-from dah_telegram.available_types import (Update)
+from dah_telegram import Update
 
 
 # this is HTTP API
@@ -77,14 +78,14 @@ def message(func):
         if files is not None:
             del data['files']
 
-        logger.debug('DO REQUESTS: url = ' + url + ', data = ' + str(data))
+        logger.info('DO REQUESTS: url = ' + url + ', data = ' + str(data))
         response = requests.post(url, files=files, data=data, timeout=timeout)
-        logger.debug('GET RESPONSE: result = ' + response.text)
+        logger.info('GET RESPONSE: result = ' + response.text)
 
         if (response.status_code != 200) and (not response.json()['ok']):
             logger.error('Error response: status_code = ' + str(response.status_code) + ', response = ' + response.text)
 
-        return response
+        return response.json()['result']
 
     return decorator
 
@@ -116,35 +117,37 @@ class Bot:
         logger.info('setToken: token = ' + token)
         logger.info('set WORK_URL: base_url = ' + self.base_url)
 
-    # do request and get response
-    def doRequest(self, method, files=None, data=None):
-        response = 666
-        try:
-            logger.debug(
-                'doRequest: base_url = ' + self.base_url + method + ', files = ' + str(files) + ', data = ' + str(data))
-            response = requests.post(self.base_url + '/' + method, files=files, data=data,
-                                     timeout=self.TIME_OUT_DEFAULT)  # собственно сам запрос
-            logger.debug('getResponse' + response.text)
-        except BaseException as e:
-            logger.error('Error request: method = ' + method + ', data = ' + str(data) + ', e = ' + str(e))
-            return response
-
-        if response.status_code != 200:
-            logger.error('Error response: status_code = ' + str(response.status_code) + ', response = ' + response.text)
-
-        return response
-
     # get bot information
-    def getMe(self):
-        return self.doRequest('getMe')
-
-    # check new message and if they exist, get them
     @message
-    def getUpdates(self, data=None):
+    def getMe(self):
+
+        url = '{0}/{1}'.format(self.base_url, Method.GET_ME)
+
+        return url
+
+    # метод работает как остальные
+    @message
+    def getCleanUpdates(self, data=None):
 
         url = '{0}/{1}'.format(self.base_url, Method.GET_UPDATES)
 
         return url, data
+
+    # check new message and if they exist, get them
+    # [!] return list objects Update
+    def getUpdates(self, data=None):
+
+        update = self.getCleanUpdates(data)
+
+        if not update:
+            return None
+
+        resultList = []
+
+        for entity in update:
+            resultList.append(Update.jsonConstructor(entity, self))
+
+        return resultList
 
     # this method for loop request new message
     def worker(self, func):
@@ -164,19 +167,21 @@ class Bot:
                 break
 
             # try get one new message, only one on the list
-            update = Update.jsonConstructor(self.getUpdates(data).json()['result'][0], self)
+            update = self.getUpdates(data)
+
             # TODO: must use UpdateType
 
-            print '---\n' + str(update) + '\n---'
+            # print '---\n' + str(update) + '\n---'
 
 
             # var = res.json()['result']
             #
-            # if var:  # have new message
-            #     update['offset'] = var[0]['update_id'] + 1  # update (offset)
-            #     log.info('WE GET MSG: ' + str(var[0]))
-            #     func(var[0])  # call function
-            func(update)  # call function
+            if (update is not None) and (update is not []):  # have new message
+                data['offset'] = update[0].update_id + 1  # update (offset)
+                func(update[0])  # call function
+
+
+
 
     # we can use for jon thread
     def join_(self):

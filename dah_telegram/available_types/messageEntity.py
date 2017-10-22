@@ -23,18 +23,24 @@ class MessageEntity:
 
     @staticmethod
     def jsonConstructor(data, bot):
-        
-        if (data is None) or (bot is None):  # we return None if can not create instance
+
+        if (data is None) or (bot is None) or (data is []):  # we return None if can not create instance
             return None
 
-        messageEntity = MessageEntity(messageEntity_type=data.get('type'),
-                                      offset=data.get('offset'),
-                                      length=data.get('length'),
-                                      url=data.get('url'),
-                                      user=data.get('user'),
-                                      bot=bot)
+        resultList = []
 
-        return messageEntity
+        for entity in data:
+            resultList.append(MessageEntity(messageEntity_type=entity.get('type'),
+                                            offset=entity.get('offset'),
+                                            length=entity.get('length'),
+                                            url=entity.get('url'),
+                                            user=entity.get('user'),
+                                            bot=bot))
+
+        if resultList.count == 1:
+            return resultList.pop()
+        else:
+            return resultList
 
     def __str__(self):
         return ('messageEntity_type = { ' + str(self.messageEntity_type) + ' },\n' +

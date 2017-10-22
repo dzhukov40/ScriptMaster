@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
-from chat import Chat
-from user import User
+from dah_telegram import User
+from dah_telegram import Chat
+from dah_telegram import MessageEntity
+from dah_telegram import Audio
+from dah_telegram import Document
+from dah_telegram import Game
+from dah_telegram import PhotoSize
+from dah_telegram import Sticker
+from dah_telegram import Video
+from dah_telegram import Voice
+
 
 
 class Message:
@@ -114,16 +123,16 @@ class Message:
 
                           author_signature=data.get('author_signature'),
                           text=data.get('text'),
-                          entities=data.get('entities'),
-                          caption_entities=data.get('caption_entities'),
-                          audio=data.get('audio'),
-                          document=data.get('document'),
-                          game=data.get('game'),
-                          photo=data.get('photo'),
-                          sticker=data.get('sticker'),
-                          video=data.get('video'),
+                          entities=MessageEntity.jsonConstructor(data.get('entities'), bot),
+                          caption_entities=MessageEntity.jsonConstructor(data.get('caption_entities'), bot),
+                          audio=Audio.jsonConstructor(data.get('audio'), bot),
+                          document=Document.jsonConstructor(data.get('document'), bot),
+                          game=Game.jsonConstructor(data.get('game'), bot),
+                          photo=PhotoSize.jsonConstructor(data.get('photo'), bot),
+                          sticker=Sticker.jsonConstructor(data.get('sticker'), bot),
+                          video=Video.jsonConstructor(data.get('video'), bot),
 
-                          video_note=data.get('video_note'),
+                          video_note=Voice.jsonConstructor(data.get('video_note'), bot),
                           caption=data.get('caption'),
                           contact=data.get('contact'),
                           location=data.get('location'),
@@ -144,7 +153,6 @@ class Message:
                           successful_payment=data.get('successful_payment'),
 
                           bot=bot)
-        print message
 
         return message
 
@@ -161,7 +169,8 @@ class Message:
                 'edit_date = { ' + str(self.edit_date) + ' },\n' +
 
                 'author_signature = { ' + str(self.author_signature) + ',\n' +
-                'text = { ' + str(self.text) + ' },\n' +
+                # 'text = { ' + str(self.text).format().encode('utf8') + ' },\n' +
+                'text = {  ASCII CODEC errror   },\n' +
                 'entities = { ' + str(self.entities) + ' },\n' +
                 'caption_entities = { ' + str(self.caption_entities) + ' },\n' +
                 'audio = { ' + str(self.audio) + ' },\n' +

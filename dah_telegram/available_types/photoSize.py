@@ -21,16 +21,22 @@ class PhotoSize:
     @staticmethod
     def jsonConstructor(data, bot):
 
-        if (data is None) or (bot is None):  # we return None if can not create instance
+        if (data is None) or (bot is None) or (data is []):  # we return None if can not create instance
             return None
 
-        photoSize = PhotoSize(file_id=data.get('file_id'),
-                              width=data.get('width'),
-                              height=data.get('height'),
-                              file_size=data.get('file_size'),
-                              bot=bot)
+        resultList = []
 
-        return photoSize
+        for entity in data:
+            resultList.append(PhotoSize(file_id=entity.get('file_id'),
+                                        width=entity.get('width'),
+                                        height=entity.get('height'),
+                                        file_size=entity.get('file_size'),
+                                        bot=bot))
+
+        if resultList.count == 1:
+            return resultList.pop()
+        else:
+            return resultList
 
     def __str__(self):
         return ('file_id = { ' + str(self.file_id) + ' },\n' +

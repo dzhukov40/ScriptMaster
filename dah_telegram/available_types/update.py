@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from dah_telegram.available_types import CallbackQuery
-from dah_telegram.inline_mod import InlineQuery, ChosenInlineResult
-from dah_telegram.payments import ShippingQuery
-from dah_telegram.payments.preCheckoutQuery import PreCheckoutQuery
-from message import Message
+from dah_telegram import CallbackQuery
+from dah_telegram import InlineQuery
+from dah_telegram import ChosenInlineResult
+from dah_telegram import ShippingQuery
+from dah_telegram import PreCheckoutQuery
+from dah_telegram import Message
 
 
 class Update:
@@ -58,7 +59,7 @@ class Update:
         return update
 
     def __str__(self):
-        return ('update_id = { ' + str(self.update_id) + ' },\n' +
+        return ('update_id =  { ' + str(self.update_id) + ' },\n' +
                 'message = { ' + str(self.message) + ' },\n' +
                 'edited_message = { ' + str(self.edited_message) + ' },\n' +
                 'channel_post = { ' + str(self.channel_post) + ' },\n' +
