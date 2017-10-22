@@ -58,16 +58,16 @@ class Update:
 
         return update
 
-    def __str__(self):
-        return ('update_id =  { ' + str(self.update_id) + ' },\n' +
-                'message = { ' + str(self.message) + ' },\n' +
-                'edited_message = { ' + str(self.edited_message) + ' },\n' +
-                'channel_post = { ' + str(self.channel_post) + ' },\n' +
-                'edited_channel_post = { ' + str(self.edited_channel_post) + ' },\n' +
-                'inline_query = { ' + str(self.inline_query) + ' },\n' +
-                'chosen_inline_result = { ' + str(self.chosen_inline_result) + ' },\n' +
-                'callback_query = { ' + str(self.callback_query) + ' },\n' +
-                'shipping_query = { ' + str(self.shipping_query) + ' },\n' +
-                'pre_checkout_query = { ' + str(self.pre_checkout_query) + ' },\n' +
-                'bot = { ' + str(self.bot) + ' }'
-                )
+    # def __str__(self):
+    #     return ('update_id =  { ' + str(self.update_id) + ' },\n' +
+    #             'message = { ' + str(self.message) + ' },\n' +
+    #             'edited_message = { ' + str(self.edited_message) + ' },\n' +
+    #             'channel_post = { ' + str(self.channel_post) + ' },\n' +
+    #             'edited_channel_post = { ' + str(self.edited_channel_post) + ' },\n' +
+    #             'inline_query = { ' + str(self.inline_query) + ' },\n' +
+    #             'chosen_inline_result = { ' + str(self.chosen_inline_result) + ' },\n' +
+    #             'callback_query = { ' + str(self.callback_query) + ' },\n' +
+    #             'shipping_query = { ' + str(self.shipping_query) + ' },\n' +
+    #             'pre_checkout_query = { ' + str(self.pre_checkout_query) + ' },\n' +
+    #             'bot = { ' + str(self.bot) + ' }'
+    #             )

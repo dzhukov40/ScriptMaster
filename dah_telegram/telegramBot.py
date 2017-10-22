@@ -169,19 +169,9 @@ class Bot:
             # try get one new message, only one on the list
             update = self.getUpdates(data)
 
-            # TODO: must use UpdateType
-
-            # print '---\n' + str(update) + '\n---'
-
-
-            # var = res.json()['result']
-            #
             if (update is not None) and (update is not []):  # have new message
                 data['offset'] = update[0].update_id + 1  # update (offset)
                 func(update[0])  # call function
-
-
-
 
     # we can use for jon thread
     def join_(self):

@@ -60,6 +60,9 @@ class Chat:
 
         return chat
 
+    def test(self):
+        print 'chat->test'
+
     def __str__(self):
         return ('chat_id = { ' + str(self.chat_id) + ' },\n' +
                 'chat_type = { ' + str(self.chat_type) + ' },\n' +
