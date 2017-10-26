@@ -84,6 +84,7 @@ def message(func):
 
         if (response.status_code != 200) and (not response.json()['ok']):
             logger.error('Error response: status_code = ' + str(response.status_code) + ', response = ' + response.text)
+            return None
 
         return response.json()['result']
 
@@ -189,6 +190,9 @@ class Bot:
     # we wont stop infinity loop
     def stopListen(self):
         self.startStopFlag = State.STOP
+
+    def getRunStatus(self):
+        return self.startStopFlag
 
     @message
     def sendMessage(self, chat_id, text, parse_mode=None, disable_web_page_preview=None, **kwargs):

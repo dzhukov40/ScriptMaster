@@ -21,15 +21,19 @@ def readConfig(path):
 
 
 def tort(msg):
-    # msg = Update(msg) # do not work (((
-    chatId = msg.message.chat.chat_id
-    chatText = msg.message.text
 
-    msg.message.chat.test()
-    print ' msg.chat.chat_id = ' + str(chatId)
-    # print ' msg.message.text = ' + str(chatText)
+    # check type. Must be to indicate type!
+    if isinstance(msg, Update):
 
-    bot.sendMessage(chatId, chatText)
+        chatId = msg.message.chat.chat_id
+        chatText = msg.message.text
+
+        msg.message.chat.test()
+
+        print ' msg.chat.chat_id = ' + str(chatId)
+        # print ' msg.message.text = ' + str(chatText)
+
+        bot.sendMessage(chatId, chatText)
 
     # messageChatId = BotUtility.getMessageChatId(msg)
 
@@ -82,6 +86,8 @@ def main():
     bot.setToken(config['telegram_token'])
 
     # print (bot.getMe().text)
+    # need registration list of functions !!!
+    # and add or delite in work time
     bot.startListen(tort, False)
     print ('основной поток дотопал до конца')
 
