@@ -3,6 +3,8 @@ import unittest
 from time import sleep
 
 from dah_telegram import Bot, Update
+from dah_telegram.available_types.inlineKeyboardButton import InlineKeyboardButton
+from dah_telegram.available_types.inlineKeyboardMarkup import InlineKeyboardMarkup
 
 """
 Тестовый случай создаётся путём наследования от unittest.TestCase. 
@@ -54,6 +56,18 @@ class TestTelegramBot(unittest.TestCase):
             self.assertTrue(False)
             return
         bot.sendMessage(chat_id, "Привети, это Тесты Детка!")
+
+        inlineKeyboardButton1 = InlineKeyboardButton(text='1', url='http://ya.ru')
+        inlineKeyboardButton2 = InlineKeyboardButton(text='2', url='http://ya.ru')
+        inlineKeyboardButton3 = InlineKeyboardButton(text='3', url='http://ya.ru')
+        inlineKeyboardButton4 = InlineKeyboardButton(text='4', url='http://ya.ru')
+        arrayButtons1 = [inlineKeyboardButton1, inlineKeyboardButton2]
+        arrayButtons2 = [inlineKeyboardButton3, inlineKeyboardButton4]
+        inlineKeyboardMarkup1 = InlineKeyboardMarkup(inline_keyboard=[arrayButtons1, arrayButtons2])
+        inlineKeyboardMarkup2 = InlineKeyboardMarkup(inline_keyboard=[arrayButtons1, arrayButtons2])
+
+        bot.sendMessage(chat_id, "проверочка кнопок1", reply_markup=inlineKeyboardMarkup1.jsonConvert())
+        bot.sendMessage(chat_id, "проверочка кнопок2", reply_markup=inlineKeyboardMarkup2.jsonConvert())
         self.assertTrue(True)
 
     def test_sendPhoto(self):

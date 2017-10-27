@@ -7,6 +7,7 @@ from time import sleep
 
 import enum
 import requests
+from requests import ConnectionError
 
 from dah_telegram import Update
 
@@ -17,6 +18,8 @@ from dah_telegram import Update
 
 # logging.getLogger(__name__).addHandler(logging.NullHandler())
 logger = logging.getLogger(__name__)
+
+RETRY_PAUSE = 1
 
 
 class State(enum.Enum):
@@ -79,7 +82,11 @@ def message(func):
             del data['files']
 
         logger.info('DO REQUESTS: url = ' + url + ', data = ' + str(data))
-        response = requests.post(url, files=files, data=data, timeout=timeout)
+        try:
+            response = requests.post(url, files=files, data=data, timeout=timeout)
+        except ConnectionError:
+            logger.warning('ConnectionError: RETRY_PAUSE = ' + RETRY_PAUSE)
+            sleep(RETRY_PAUSE)
         logger.info('GET RESPONSE: result = ' + response.text)
 
         if (response.status_code != 200) and (not response.json()['ok']):
@@ -101,6 +108,7 @@ class Bot:
     TIME_OUT_DEFAULT = 10
     # TIME_PAUSE = 0.3
     TIME_PAUSE = 2
+    UPDATE_LIMIT = 50  # may be in range 1-100
     thread_ = threading.Thread
 
     # constructor
@@ -159,7 +167,10 @@ class Bot:
         self.startStopFlag = State.START
 
         # we get message one by one
-        data = {'offset': 0, 'limit': 1, 'timeout': 0}
+        data = {'offset': 0, 'limit': self.UPDATE_LIMIT, 'timeout': 0}
+
+        # this is buf help do less requests
+        updateList = []
 
         # loop
         while True:
@@ -168,11 +179,12 @@ class Bot:
                 break
 
             # try get one new message, only one on the list
-            update = self.getUpdates(data)
+            updateList = self.getUpdates(data)
 
-            if (update is not None) and (update is not []):  # have new message
-                data['offset'] = update[0].update_id + 1  # update (offset)
-                func(update[0])  # call function
+            if (updateList is not None) and (updateList is not []):  # have new message
+                for update in updateList:
+                    data['offset'] = update.update_id + 1  # update (offset)
+                    func(update)  # call function
 
     # we can use for jon thread
     def join_(self):

@@ -2,8 +2,11 @@
 import ConfigParser
 
 import logging.handlers
+import json
 
 from dah_telegram import Bot, Update
+from dah_telegram.available_types.inlineKeyboardButton import InlineKeyboardButton
+from dah_telegram.available_types.inlineKeyboardMarkup import InlineKeyboardMarkup
 
 CONFIG_PATH = "config.ini"
 
@@ -33,7 +36,26 @@ def tort(msg):
         print ' msg.chat.chat_id = ' + str(chatId)
         # print ' msg.message.text = ' + str(chatText)
 
-        bot.sendMessage(chatId, chatText)
+        inlineKeyboardButton1 = InlineKeyboardButton(text='1', url='http://ya.ru')
+        inlineKeyboardButton2 = InlineKeyboardButton(text='2', url='http://ya.ru')
+        inlineKeyboardButton3 = InlineKeyboardButton(text='3', url='http://ya.ru')
+        inlineKeyboardButton4 = InlineKeyboardButton(text='4', url='http://ya.ru')
+        arrayButtons1 = [inlineKeyboardButton1, inlineKeyboardButton2]
+        arrayButtons2 = [inlineKeyboardButton3, inlineKeyboardButton4]
+        inlineKeyboardMarkup1 = InlineKeyboardMarkup(inline_keyboard=[arrayButtons1, arrayButtons2])
+        inlineKeyboardMarkup2 = InlineKeyboardMarkup(inline_keyboard=[arrayButtons1, arrayButtons2])
+
+        bot.sendMessage(chatId, chatText, reply_markup=inlineKeyboardMarkup1.jsonConvert())
+        bot.sendMessage(chatId, chatText, reply_markup=inlineKeyboardMarkup2.jsonConvert())
+
+
+        #inlineKeyboardMarkup2.arrayConvert()
+
+        #inlineKeyboardMarkup1 = json.dumps(inlineKeyboardMarkup1)
+        #inlineKeyboardMarkup2 = json.dumps(inlineKeyboardMarkup2)
+
+        #bot.sendMessage(chatId, chatText, reply_markup=inlineKeyboardMarkup1)
+        #bot.sendMessage(chatId, chatText, reply_markup=inlineKeyboardMarkup2)
 
 
 def main():
